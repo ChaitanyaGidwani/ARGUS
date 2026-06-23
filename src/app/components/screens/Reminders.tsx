@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AlertTriangle, ChevronRight, Bell, Mail, Smartphone } from "lucide-react";
-import { opportunities, domainMap } from "../data";
+import { opportunities, categoryMap } from "../data";
 import { timeLeft, urgencyColor } from "../utils";
 
 export function Reminders({ saved, onOpen }: { saved: string[]; onOpen: (id: string) => void }) {
@@ -34,13 +34,13 @@ export function Reminders({ saved, onOpen }: { saved: string[]; onOpen: (id: str
           {upcoming.map(o => {
             const tl = timeLeft(o.deadline);
             const uc = urgencyColor(tl.urgency);
-            const dom = domainMap[o.domain];
+            const cat = categoryMap[o.category];
             return (
               <div key={o.id} className="flex items-stretch gap-3 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/10 overflow-hidden">
                 <div className="w-1.5 shrink-0" style={{ background: uc.text }} />
                 <div className="flex-1 py-3 pr-3 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: dom.bg, color: dom.color }}>{o.type}</span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: cat.bg, color: cat.color }}>{o.type}</span>
                     <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: uc.bg, color: uc.text }}>{tl.text}</span>
                   </div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">{o.title}</h3>
@@ -82,11 +82,11 @@ export function Reminders({ saved, onOpen }: { saved: string[]; onOpen: (id: str
             </div>
           ) : savedList.map(o => {
             const tl = timeLeft(o.deadline);
-            const dom = domainMap[o.domain];
+            const cat = categoryMap[o.category];
             return (
               <button key={o.id} onClick={() => onOpen(o.id)} className="w-full flex items-center gap-3 p-3 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/10 text-left">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: dom.bg }}>
-                  <dom.icon className="w-4 h-4" style={{ color: dom.color }} />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: cat.bg }}>
+                  <cat.icon className="w-4 h-4" style={{ color: cat.color }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{o.title}</h4>

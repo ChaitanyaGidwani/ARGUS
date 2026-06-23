@@ -1,13 +1,13 @@
 import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal, Inbox } from "lucide-react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { domains, opportunities, Domain, OppType, Mode } from "../data";
+import { categories, opportunities, Category, OppType, Mode } from "../data";
 import { OpportunityCard } from "../OpportunityCard";
 
 export function Explore({ saved, onSave, onOpen }: any) {
   const [q, setQ] = useState("");
   const [type, setType] = useState<OppType | "All">("All");
-  const [dom, setDom] = useState<Domain | "All">("All");
+  const [dom, setDom] = useState<Category | "All">("All");
   const [mode, setMode] = useState<Mode | "All">("All");
   const [sort, setSort] = useState<"deadline" | "prize">("deadline");
 
@@ -15,14 +15,14 @@ export function Explore({ saved, onSave, onOpen }: any) {
     return opportunities
       .filter(o => !q || o.title.toLowerCase().includes(q.toLowerCase()) || o.organizer.toLowerCase().includes(q.toLowerCase()))
       .filter(o => type === "All" || o.type === type)
-      .filter(o => dom === "All" || o.domain === dom)
+      .filter(o => dom === "All" || o.category === dom)
       .filter(o => mode === "All" || o.mode === mode)
       .sort((a, b) => sort === "deadline"
         ? new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
         : 0);
   }, [q, type, dom, mode, sort]);
 
-  const types: (OppType | "All")[] = ["All", "Hackathon", "Internship", "Bounty", "Certification", "Workshop", "Open Source"];
+  const types: (OppType | "All")[] = ["All", "Hackathon", "Internship", "Scholarship", "Competition", "Workshop", "Fellowship"];
 
   return (
     <div className="pb-24">
@@ -40,7 +40,7 @@ export function Explore({ saved, onSave, onOpen }: any) {
 
         <div className="flex gap-2 overflow-x-auto no-scrollbar">
           <Select value={type} onChange={v => setType(v as any)} options={types} />
-          <Select value={dom} onChange={v => setDom(v as any)} options={["All", ...domains.map(d => d.name)]} />
+          <Select value={dom} onChange={v => setDom(v as any)} options={["All", ...categories.map(c => c.name)]} />
           <Select value={mode} onChange={v => setMode(v as any)} options={["All", "Online", "Offline", "Hybrid"]} />
           <Select value={sort} onChange={v => setSort(v as any)} options={["deadline", "prize"]} prefix="Sort: " />
         </div>

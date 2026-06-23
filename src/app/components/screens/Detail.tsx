@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Bookmark, Bell, ExternalLink, Calendar, MapPin, Trophy, GraduationCap, Layers, Cpu, ChevronDown, Check } from "lucide-react";
-import { Opportunity, domainMap } from "../data";
+import { Opportunity, categoryMap } from "../data";
 import { timeLeft, urgencyColor } from "../utils";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function Detail({ opp, saved, onSave, onBack }: Props) {
-  const dom = domainMap[opp.domain];
+  const cat = categoryMap[opp.category];
   const tl = timeLeft(opp.deadline);
   const uc = urgencyColor(tl.urgency);
   const [expand, setExpand] = useState(false);
@@ -22,7 +22,7 @@ export function Detail({ opp, saved, onSave, onBack }: Props) {
   return (
     <div className="pb-24">
       {/* Hero */}
-      <div className="relative h-56 overflow-hidden" style={{ background: `linear-gradient(135deg, ${dom.color}, ${dom.color}66)` }}>
+      <div className="relative h-56 overflow-hidden" style={{ background: `linear-gradient(135deg, ${cat.color}, ${cat.color}66)` }}>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white dark:to-[#0A0F1E]" />
         <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(circle at 80% 20%, white, transparent 50%)" }} />
 
@@ -37,7 +37,7 @@ export function Detail({ opp, saved, onSave, onBack }: Props) {
 
         <div className="absolute bottom-6 left-4 right-4">
           <span className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider bg-white/20 backdrop-blur-xl text-white px-2.5 py-1 rounded-md mb-2">
-            <dom.icon className="w-3 h-3" /> {opp.type}
+            <cat.icon className="w-3 h-3" /> {opp.type}
           </span>
           <h1 className="text-2xl font-extrabold text-white leading-tight">{opp.title}</h1>
         </div>
@@ -58,9 +58,9 @@ export function Detail({ opp, saved, onSave, onBack }: Props) {
         <div className="grid grid-cols-2 gap-2 mb-5">
           <InfoChip icon={Calendar} label="Deadline" value={tl.text} color={uc.text} />
           <InfoChip icon={MapPin} label="Mode" value={opp.mode} />
-          <InfoChip icon={Trophy} label="Prize" value={opp.prize} color={dom.color} />
+          <InfoChip icon={Trophy} label="Prize" value={opp.prize} color={cat.color} />
           <InfoChip icon={GraduationCap} label="Eligibility" value={opp.eligibility} />
-          <InfoChip icon={Layers} label="Domain" value={opp.domain} color={dom.color} />
+          <InfoChip icon={Layers} label="Category" value={opp.category} color={cat.color} />
           <InfoChip icon={Cpu} label="Branches" value={opp.branches} />
         </div>
 

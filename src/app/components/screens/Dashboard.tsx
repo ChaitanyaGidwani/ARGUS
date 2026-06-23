@@ -1,152 +1,130 @@
-import { Search, Bell, Eye, AlertCircle, Coins, GraduationCap, Flame } from "lucide-react";
-import { domains, Domain, opportunities } from "../data";
+import { Search, Bell, Radar, AlertCircle, Briefcase, GraduationCap, Trophy } from "lucide-react";
+import { categories, Category, opportunities } from "../data";
 import { OpportunityCard } from "../OpportunityCard";
 
 interface Props {
   saved: string[];
   onSave: (id: string) => void;
   onOpen: (id: string) => void;
-  onOpenHub: (d: Domain) => void;
-  filter: Domain | "All";
-  setFilter: (d: Domain | "All") => void;
+  onOpenHub: (c: Category) => void;
+  filter: Category | "All";
+  setFilter: (c: Category | "All") => void;
   goExplore: () => void;
 }
 
 export function Dashboard({ saved, onSave, onOpen, onOpenHub, filter, setFilter, goExplore }: Props) {
-  const filtered = filter === "All" ? opportunities : opportunities.filter(o => o.domain === filter);
+  const filtered = filter === "All" ? opportunities : opportunities.filter(o => o.category === filter);
   const closingSoon = opportunities.filter(o => new Date(o.deadline).getTime() - Date.now() < 24 * 3600 * 1000).length;
 
-  const featured = filtered.slice(0, 5);
-  const hackathons = filtered.filter(o => o.type === "Hackathon");
-  const bounties = filtered.filter(o => o.type === "Bounty");
-  const certs = opportunities.filter(o => o.type === "Certification" || o.type === "Workshop");
+  const feed = filtered.slice(0, 4);
+  const internships = filtered.filter(o => o.type === "Internship");
+  const scholarships = filtered.filter(o => o.type === "Scholarship");
+  const competitions = filtered.filter(o => o.type === "Competition");
 
   return (
-    <div className="flex flex-col gap-5 pb-24">
+    <div className="flex flex-col gap-6 pb-24 bg-slate-50 dark:bg-[#070B14] min-h-screen">
       {/* Top nav */}
-      <div className="sticky top-0 z-20 backdrop-blur-2xl bg-white/60 dark:bg-[#0A0F1E]/80 border-b border-white/60 dark:border-white/5 shadow-sm shadow-violet-500/5 px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-20 backdrop-blur-xl bg-white/80 dark:bg-[#0A0F1E]/90 border-b border-slate-200 dark:border-white/5 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="relative w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br from-cyan-400 via-violet-500 to-amber-400 shadow-[0_0_14px_rgba(0,212,255,0.45)]">
-            <Eye className="w-4 h-4 text-white" strokeWidth={2.5} />
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-600 shadow-md">
+            <Radar className="w-5 h-5 text-white" />
           </div>
-          <span className="font-extrabold tracking-tight bg-gradient-to-r from-cyan-500 via-violet-500 to-amber-400 bg-clip-text text-transparent">ARGUS</span>
+          <span className="font-extrabold tracking-tight text-slate-900 dark:text-white text-lg">Radar</span>
         </div>
-        <div className="flex items-center gap-1">
-          <button onClick={goExplore} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
-            <Search className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+        <div className="flex items-center gap-2">
+          <button onClick={goExplore} className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">
+            <Search className="w-4 h-4" />
           </button>
-          <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 relative">
-            <Bell className="w-5 h-5 text-slate-700 dark:text-slate-200" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 ring-2 ring-white dark:ring-[#0A0F1E]" />
+          <button className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 relative">
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 border-2 border-slate-100 dark:border-[#0A0F1E]" />
           </button>
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-400 to-cyan-400 flex items-center justify-center text-white text-sm font-bold ml-1">A</div>
+          <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 ml-1 overflow-hidden">
+            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Aarav&backgroundColor=transparent" alt="Profile" className="w-full h-full object-cover" />
+          </div>
         </div>
       </div>
 
       <div className="px-4">
-        <h1 className="text-2xl font-bold tracking-tight">
-          <span className="text-slate-900 dark:text-white">Good morning, </span>
-          <span className="bg-gradient-to-r from-cyan-500 via-violet-500 to-fuchsia-500 bg-clip-text text-transparent">Aarav</span>
-          <span className="text-slate-900 dark:text-white"> 👋</span>
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">A hundred eyes are watching — here's what they saw today.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-1">Your Personalised Feed</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Curated opportunities matching your profile.</p>
       </div>
 
-      {/* Domain pills */}
+      {/* Deadline Nudges */}
+      {closingSoon > 0 && (
+        <div className="mx-4 rounded-xl p-4 flex items-center gap-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20">
+          <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center shrink-0">
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-slate-900 dark:text-white">Deadline Nudge</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">{closingSoon} saved opportunities closing in 24h</p>
+          </div>
+          <button className="text-xs font-bold text-white bg-red-600 hover:bg-red-700 px-3 py-2 rounded-lg transition-colors">Review</button>
+        </div>
+      )}
+
+      {/* Category filters */}
       <div className="px-4 overflow-x-auto no-scrollbar">
         <div className="flex gap-2 w-max">
-          {(["All", ...domains.map(d => d.name)] as (Domain | "All")[]).map(d => {
-            const isActive = filter === d;
-            const dom = d !== "All" ? domains.find(x => x.name === d)! : null;
+          {(["All", ...categories.map(c => c.name)] as (Category | "All")[]).map(c => {
+            const isActive = filter === c;
+            const cat = c !== "All" ? categories.find(x => x.name === c)! : null;
             return (
               <button
-                key={d}
-                onClick={() => setFilter(d)}
-                className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border"
-                style={{
-                  background: isActive ? (dom?.color || "#0F172A") : "transparent",
-                  color: isActive ? "white" : undefined,
-                  borderColor: isActive ? "transparent" : "rgba(100,116,139,0.25)",
-                }}
+                key={c}
+                onClick={() => setFilter(c)}
+                className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all border ${
+                  isActive 
+                    ? "bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white" 
+                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 dark:bg-[#0A0F1E] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/5"
+                }`}
               >
-                {d}
+                {c}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Deadline strip */}
-      {closingSoon > 0 && (
-        <div className="mx-4 rounded-2xl p-4 flex items-center gap-3 border border-amber-300/70 dark:border-amber-500/30 shadow-lg shadow-amber-500/10 dark:shadow-none" style={{ background: "linear-gradient(90deg, rgba(239,68,68,0.18), rgba(245,158,11,0.22))" }}>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
-            <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-slate-900 dark:text-white">{closingSoon} opportunities closing in 24h</p>
-            <p className="text-xs text-slate-600 dark:text-slate-400">Don't miss out — apply now</p>
-          </div>
-          <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">23:14:08</span>
-        </div>
-      )}
-
-      {/* Featured */}
-      <Section title="✨ Featured" onSeeAll={goExplore}>
-        <div className="flex gap-3 px-4 overflow-x-auto no-scrollbar pb-2">
-          {featured.map(o => (
-            <OpportunityCard key={o.id} opp={o} saved={saved.includes(o.id)} onSave={onSave} onOpen={onOpen} variant="featured" />
-          ))}
-        </div>
-      </Section>
-
-      <Section title="🔥 Trending Hackathons" icon={Flame} onSeeAll={goExplore}>
-        <Row>
-          {hackathons.map(o => <OpportunityCard key={o.id} opp={o} saved={saved.includes(o.id)} onSave={onSave} onOpen={onOpen} />)}
-        </Row>
-      </Section>
-
-      <Section title="💰 Top Bounties" icon={Coins} onSeeAll={goExplore}>
-        <Row>
-          {bounties.map(o => <OpportunityCard key={o.id} opp={o} saved={saved.includes(o.id)} onSave={onSave} onOpen={onOpen} />)}
-        </Row>
-      </Section>
-
-      <Section title="📚 Certifications & Workshops" icon={GraduationCap} onSeeAll={goExplore}>
-        <Row>
-          {certs.map(o => <OpportunityCard key={o.id} opp={o} saved={saved.includes(o.id)} onSave={onSave} onOpen={onOpen} />)}
-        </Row>
-      </Section>
-
-      {/* Domain quick links */}
-      <div className="px-4">
-        <h2 className="text-base font-bold text-slate-900 dark:text-white mb-3">Browse by domain</h2>
-        <div className="grid grid-cols-2 gap-2">
-          {domains.map(d => (
-            <button key={d.name} onClick={() => onOpenHub(d.name)} className="p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/[0.04] backdrop-blur-xl flex items-center gap-2 hover:-translate-y-0.5 transition-all">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: d.bg }}>
-                <d.icon className="w-4 h-4" style={{ color: d.color }} />
-              </div>
-              <div className="text-left">
-                <div className="text-sm font-semibold text-slate-900 dark:text-white">{d.name}</div>
-                <div className="text-[10px] text-slate-500 dark:text-slate-400">Explore hub →</div>
-              </div>
-            </button>
-          ))}
-        </div>
+      {/* Main Feed - Vertical */}
+      <div className="px-4 space-y-4">
+        {feed.map(o => (
+          <OpportunityCard key={o.id} opp={o} saved={saved.includes(o.id)} onSave={onSave} onOpen={onOpen} variant="grid" />
+        ))}
       </div>
+
+      {/* Horizontal Sections for specific types */}
+      <Section title="Internships for You" icon={Briefcase} onSeeAll={goExplore}>
+        <Row>
+          {internships.map(o => <OpportunityCard key={o.id} opp={o} saved={saved.includes(o.id)} onSave={onSave} onOpen={onOpen} />)}
+        </Row>
+      </Section>
+
+      <Section title="Scholarships" icon={GraduationCap} onSeeAll={goExplore}>
+        <Row>
+          {scholarships.map(o => <OpportunityCard key={o.id} opp={o} saved={saved.includes(o.id)} onSave={onSave} onOpen={onOpen} />)}
+        </Row>
+      </Section>
+
+      <Section title="Upcoming Competitions" icon={Trophy} onSeeAll={goExplore}>
+        <Row>
+          {competitions.map(o => <OpportunityCard key={o.id} opp={o} saved={saved.includes(o.id)} onSave={onSave} onOpen={onOpen} />)}
+        </Row>
+      </Section>
     </div>
   );
 }
 
 function Section({ title, icon: Icon, children, onSeeAll }: any) {
   return (
-    <div>
-      <div className="flex items-center justify-between px-4 mb-2">
+    <div className="pt-2">
+      <div className="flex items-center justify-between px-4 mb-3">
         <div className="flex items-center gap-2">
-          {Icon && <Icon className="w-4 h-4 text-slate-700 dark:text-slate-200" />}
-          <h2 className="text-base font-bold text-slate-900 dark:text-white">{title}</h2>
+          {Icon && <div className="p-1.5 bg-slate-100 dark:bg-white/10 rounded-md"><Icon className="w-4 h-4 text-slate-700 dark:text-slate-300" /></div>}
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h2>
         </div>
-        <button onClick={onSeeAll} className="text-xs font-medium text-cyan-600 dark:text-cyan-400">See all</button>
+        <button onClick={onSeeAll} className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">See all</button>
       </div>
       {children}
     </div>
@@ -154,5 +132,5 @@ function Section({ title, icon: Icon, children, onSeeAll }: any) {
 }
 
 function Row({ children }: any) {
-  return <div className="flex gap-3 px-4 overflow-x-auto no-scrollbar pb-2">{children}</div>;
+  return <div className="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-4">{children}</div>;
 }

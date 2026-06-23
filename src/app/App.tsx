@@ -5,19 +5,20 @@ import { Dashboard } from "./components/screens/Dashboard";
 import { Explore } from "./components/screens/Explore";
 import { Detail } from "./components/screens/Detail";
 import { Reminders } from "./components/screens/Reminders";
-import { DomainHub } from "./components/screens/DomainHub";
-import { Domain, opportunities } from "./components/data";
+import { CategoryHub } from "./components/screens/CategoryHub";
+import { Category, opportunities } from "./components/data";
 
 type Tab = "home" | "explore" | "reminders" | "profile";
-type View = { kind: "tab"; tab: Tab } | { kind: "detail"; id: string } | { kind: "hub"; domain: Domain };
+type View = { kind: "tab"; tab: Tab } | { kind: "detail"; id: string } | { kind: "hub"; category: Category };
 
 export default function App() {
   const [onboarded, setOnboarded] = useState(false);
-  const [selectedDomains, setSelectedDomains] = useState<Domain[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  const [profileData, setProfileData] = useState<{ year: string; branch: string }>({ year: "", branch: "" });
   const [view, setView] = useState<View>({ kind: "tab", tab: "home" });
   const [history, setHistory] = useState<View[]>([]);
   const [saved, setSaved] = useState<string[]>(["2", "5"]);
-  const [filter, setFilter] = useState<Domain | "All">("All");
+  const [filter, setFilter] = useState<Category | "All">("All");
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function App() {
   if (!onboarded) {
     return (
       <Frame dark={dark} setDark={setDark}>
-        <Onboarding onContinue={(ds) => { setSelectedDomains(ds); setOnboarded(true); }} />
+        <Onboarding onContinue={(cats, year, branch) => { setSelectedCategories(cats); setProfileData({ year, branch }); setOnboarded(true); }} />
       </Frame>
     );
   }
@@ -51,14 +52,14 @@ export default function App() {
           <Detail opp={opp} saved={saved.includes(opp.id)} onSave={onSave} onBack={back} />
         )}
         {view.kind === "hub" && (
-          <DomainHub domain={view.domain} saved={saved} onSave={onSave} onOpen={(id) => push({ kind: "detail", id })} onBack={back} />
+          <CategoryHub category={view.category} saved={saved} onSave={onSave} onOpen={(id) => push({ kind: "detail", id })} onBack={back} />
         )}
         {tab === "home" && (
           <Dashboard
             saved={saved}
             onSave={onSave}
             onOpen={(id) => push({ kind: "detail", id })}
-            onOpenHub={(d) => push({ kind: "hub", domain: d })}
+            onOpenHub={(c) => push({ kind: "hub", category: c })}
             filter={filter}
             setFilter={setFilter}
             goExplore={() => setView({ kind: "tab", tab: "explore" })}
@@ -71,7 +72,7 @@ export default function App() {
           <Reminders saved={saved} onOpen={(id) => push({ kind: "detail", id })} />
         )}
         {tab === "profile" && (
-          <Profile saved={saved} domains={selectedDomains} dark={dark} setDark={setDark} />
+          <Profile saved={saved} categories={selectedCategories} profileData={profileData} dark={dark} setDark={setDark} />
         )}
       </div>
 
@@ -140,7 +141,7 @@ function BottomNav({ active, onChange }: { active: Tab | null; onChange: (t: Tab
   );
 }
 
-function Profile({ saved, domains, dark, setDark }: { saved: string[]; domains: Domain[]; dark: boolean; setDark: (b: boolean) => void }) {
+function Profile({ saved, categories, profileData, dark, setDark }: { saved: string[]; categories: Category[]; profileData: { year: string; branch: string }; dark: boolean; setDark: (b: boolean) => void }) {
   return (
     <div className="pb-24">
       <div className="px-4 pt-6 pb-4">
@@ -149,10 +150,10 @@ function Profile({ saved, domains, dark, setDark }: { saved: string[]; domains: 
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center text-white text-xl font-extrabold">A</div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Aarav Sharma</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">aarav@example.com</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Class of {profileData.year || "2026"} • {profileData.branch || "CS"}</p>
               <div className="flex gap-1 mt-1.5 flex-wrap">
-                {domains.slice(0, 3).map(d => (
-                  <span key={d} className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/60 dark:bg-white/10 text-slate-700 dark:text-slate-200">{d}</span>
+                {categories.slice(0, 3).map(c => (
+                  <span key={c} className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/60 dark:bg-white/10 text-slate-700 dark:text-slate-200">{c}</span>
                 ))}
               </div>
             </div>
